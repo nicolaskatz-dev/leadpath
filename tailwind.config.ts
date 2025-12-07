@@ -94,29 +94,31 @@ export default {
   			xl: 'var(--shadow-xl)',
   			'2xl': 'var(--shadow-2xl)'
   		},
-  		fontFamily: {
-  			sans: [
-  				'Lato',
-  				'ui-sans-serif',
-  				'system-ui',
-  				'-apple-system',
-  				'BlinkMacSystemFont',
-  				'Segoe UI',
-  				'Roboto',
-  				'Helvetica Neue',
-  				'Arial',
-  				'Noto Sans',
-  				'sans-serif'
-  			],
-  			serif: [
-  				'EB Garamond',
-  				'ui-serif',
-  				'Georgia',
-  				'Cambria',
-  				'Times New Roman',
-  				'Times',
-  				'serif'
-  			],
+		fontFamily: {
+			sans: [
+				'Geist',
+				'Hind',
+				'ui-sans-serif',
+				'system-ui',
+				'-apple-system',
+				'BlinkMacSystemFont',
+				'Segoe UI',
+				'Roboto',
+				'Helvetica Neue',
+				'Arial',
+				'Noto Sans',
+				'sans-serif'
+			],
+			serif: [
+				'Geist',
+				'Hind',
+				'ui-serif',
+				'Georgia',
+				'Cambria',
+				'Times New Roman',
+				'Times',
+				'serif'
+			],
   			mono: [
   				'Fira Code',
   				'ui-monospace',
