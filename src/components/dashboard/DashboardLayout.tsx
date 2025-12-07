@@ -9,18 +9,34 @@ import {
   Menu,
   X,
   Zap,
+  Eye,
+  Plug,
+  User,
+  CreditCard,
+  HelpCircle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
-const navigation = [
+const mainNavigation = [
   { name: 'Overview', href: '/', icon: LayoutDashboard },
   { name: 'Conversiones', href: '/conversions', icon: Users },
+  { name: 'Visitantes', href: '/visitors', icon: Eye },
   { name: 'Generador UTM', href: '/utm-builder', icon: Link2 },
+];
+
+const configNavigation = [
   { name: 'Configuración', href: '/settings', icon: Settings },
+  { name: 'Integraciones', href: '/integrations', icon: Plug },
+];
+
+const accountNavigation = [
+  { name: 'Mi cuenta', href: '/account', icon: User },
+  { name: 'Planes', href: '/plans', icon: CreditCard },
 ];
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
@@ -58,8 +74,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </Button>
         </div>
 
-        <nav className="flex flex-col gap-1 p-4">
-          {navigation.map((item) => (
+        <nav className="flex flex-col gap-1 p-4 overflow-y-auto flex-1">
+          <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Principal</p>
+          {mainNavigation.map((item) => (
             <NavLink
               key={item.name}
               to={item.href}
@@ -77,6 +94,57 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               {item.name}
             </NavLink>
           ))}
+
+          <Separator className="my-3" />
+          <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Configuración</p>
+          {configNavigation.map((item) => (
+            <NavLink
+              key={item.name}
+              to={item.href}
+              className={({ isActive }) =>
+                cn(
+                  'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                )
+              }
+              onClick={() => setSidebarOpen(false)}
+            >
+              <item.icon className="h-5 w-5" />
+              {item.name}
+            </NavLink>
+          ))}
+
+          <Separator className="my-3" />
+          <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Cuenta</p>
+          {accountNavigation.map((item) => (
+            <NavLink
+              key={item.name}
+              to={item.href}
+              className={({ isActive }) =>
+                cn(
+                  'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                )
+              }
+              onClick={() => setSidebarOpen(false)}
+            >
+              <item.icon className="h-5 w-5" />
+              {item.name}
+            </NavLink>
+          ))}
+
+          <Separator className="my-3" />
+          <a
+            href="mailto:soporte@leadpath.io"
+            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors pointer-events-none opacity-60"
+          >
+            <HelpCircle className="h-5 w-5" />
+            Soporte
+          </a>
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 p-4">
