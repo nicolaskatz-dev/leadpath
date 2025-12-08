@@ -13,7 +13,6 @@ import {
   Plug,
   User,
   CreditCard,
-  HelpCircle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -137,14 +136,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </NavLink>
           ))}
 
-          <Separator className="my-3" />
-          <a
-            href="mailto:soporte@leadpath.io"
-            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors pointer-events-none opacity-60"
-          >
-            <HelpCircle className="h-5 w-5" />
-            Soporte
-          </a>
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 p-4">
