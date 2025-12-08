@@ -96,7 +96,6 @@ export default {
   		},
 		fontFamily: {
 			sans: [
-				'Geist',
 				'Hind',
 				'ui-sans-serif',
 				'system-ui',
@@ -110,7 +109,6 @@ export default {
 				'sans-serif'
 			],
 			serif: [
-				'Geist',
 				'Hind',
 				'ui-serif',
 				'Georgia',

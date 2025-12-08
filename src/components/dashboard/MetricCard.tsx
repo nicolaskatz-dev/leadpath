@@ -19,7 +19,7 @@ export function MetricCard({
   iconColor,
 }: MetricCardProps) {
   return (
-    <div className="rounded-xl bg-card p-6 shadow-sm border border-border">
+    <div className="rounded-sm bg-card p-6 shadow-sm border border-border">
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <p className="text-sm text-muted-foreground">{title}</p>
@@ -27,7 +27,7 @@ export function MetricCard({
         </div>
         <div
           className={cn(
-            'flex h-10 w-10 items-center justify-center rounded-lg',
+            'flex h-10 w-10 items-center justify-center rounded-sm',
             iconColor || 'bg-primary/10 text-primary'
           )}
         >

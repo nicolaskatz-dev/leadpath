@@ -88,7 +88,7 @@ const Conversions = () => {
                   key={lead.id}
                   onClick={() => setSelectedLead(lead)}
                   className={cn(
-                    'w-full text-left p-4 rounded-xl border transition-all',
+                    'w-full text-left p-4 rounded-sm border transition-all',
                     selectedLead?.id === lead.id
                       ? 'bg-primary/10 border-primary'
                       : 'bg-card border-border hover:border-primary/50'
@@ -160,8 +160,8 @@ const Conversions = () => {
                 <LeadJourney lead={selectedLead} />
               </div>
             ) : (
-              <div className="rounded-xl bg-card p-12 text-center border border-border">
-                <div className="mx-auto w-16 h-16 rounded-full bg-accent flex items-center justify-center mb-4">
+              <div className="rounded-sm bg-card p-12 text-center border border-border">
+                <div className="mx-auto w-16 h-16 rounded-sm bg-accent flex items-center justify-center mb-4">
                   <Search className="h-8 w-8 text-accent-foreground" />
                 </div>
                 <h3 className="text-lg font-semibold text-card-foreground mb-2">
