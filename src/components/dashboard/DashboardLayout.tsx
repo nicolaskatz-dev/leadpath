@@ -73,7 +73,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </Button>
         </div>
 
-        <nav className="flex flex-col gap-1 p-4 overflow-y-auto flex-1">
+        <nav className="flex flex-col gap-0.5 p-3 overflow-y-auto flex-1">
           <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Principal</p>
           {mainNavigation.map((item) => (
             <NavLink
@@ -94,7 +94,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </NavLink>
           ))}
 
-          <Separator className="my-3" />
+          <Separator className="my-2" />
           <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Configuración</p>
           {configNavigation.map((item) => (
             <NavLink
@@ -115,7 +115,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </NavLink>
           ))}
 
-          <Separator className="my-3" />
+          <Separator className="my-2" />
           <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Cuenta</p>
           {accountNavigation.map((item) => (
             <NavLink

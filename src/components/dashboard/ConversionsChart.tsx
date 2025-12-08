@@ -3,7 +3,7 @@ import { dailyConversions } from '@/data/mockData';
 
 export function ConversionsChart() {
   return (
-    <div className="rounded-xl bg-card p-6 shadow-sm border border-border">
+    <div className="rounded-sm bg-card p-6 shadow-sm border border-border">
       <h3 className="text-lg font-semibold text-card-foreground mb-4">Tendencia de Conversiones</h3>
       <div className="h-[280px]">
         <ResponsiveContainer width="100%" height="100%">
@@ -31,7 +31,7 @@ export function ConversionsChart() {
               contentStyle={{
                 backgroundColor: 'hsl(var(--card))',
                 border: '1px solid hsl(var(--border))',
-                borderRadius: '8px',
+                borderRadius: '2px',
                 color: 'hsl(var(--card-foreground))'
               }}
               formatter={(value: number) => [`${value} conversiones`, '']}

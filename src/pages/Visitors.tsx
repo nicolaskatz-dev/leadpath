@@ -7,8 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { mockVisitors, visitorInsights, type Visitor } from '@/data/visitors';
-import { Users, TrendingUp, Target, Clock, Search, Filter, Eye, BarChart3, AlertTriangle } from 'lucide-react';
-import { format, formatDistanceToNow } from 'date-fns';
+import { VisitorDetailDialog } from '@/components/VisitorDetailDialog';
+import { Users, TrendingUp, Target, Clock, Search, Filter, Eye, BarChart3 } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
@@ -50,6 +51,8 @@ export default function Visitors() {
   const [sourceFilter, setSourceFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [scoreFilter, setScoreFilter] = useState<string>('all');
+  const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const filteredVisitors = useMemo(() => {
     return mockVisitors.filter((visitor) => {
@@ -304,7 +307,14 @@ export default function Visitors() {
                       </span>
                     </TableCell>
                     <TableCell>
-                      <Button variant="ghost" size="sm">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => {
+                          setSelectedVisitor(visitor);
+                          setDialogOpen(true);
+                        }}
+                      >
                         <Eye className="h-4 w-4" />
                       </Button>
                     </TableCell>
@@ -314,6 +324,12 @@ export default function Visitors() {
             </Table>
           </CardContent>
         </Card>
+
+        <VisitorDetailDialog 
+          visitor={selectedVisitor} 
+          open={dialogOpen} 
+          onOpenChange={setDialogOpen} 
+        />
       </div>
     </DashboardLayout>
   );

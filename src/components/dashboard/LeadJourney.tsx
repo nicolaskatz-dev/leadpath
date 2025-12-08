@@ -38,7 +38,7 @@ const sourceColors: Record<string, string> = {
 
 export function LeadJourney({ lead }: LeadJourneyProps) {
   return (
-    <div className="rounded-xl bg-card p-6 shadow-sm border border-border">
+    <div className="rounded-sm bg-card p-6 shadow-sm border border-border">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
         <div>

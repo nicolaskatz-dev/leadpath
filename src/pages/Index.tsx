@@ -26,7 +26,7 @@ const Index = () => {
 
         {/* Charts row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ConversionsChart className="rounded-sm" />
+          <ConversionsChart />
           <SourceChart />
         </div>
 
