@@ -12,7 +12,7 @@ export function SourcesTable() {
   const totalConversions = sourceMetrics.reduce((acc, s) => acc + s.conversions, 0);
 
   return (
-    <div className="rounded-xl bg-card p-6 shadow-sm border border-border">
+    <div className="rounded-sm bg-card p-6 shadow-sm border border-border">
       <h3 className="text-lg font-semibold text-card-foreground mb-4">Rendimiento por Fuente</h3>
       <Table>
         <TableHeader>

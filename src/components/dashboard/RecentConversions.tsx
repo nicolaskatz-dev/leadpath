@@ -18,7 +18,7 @@ export function RecentConversions() {
   const recentLeads = mockLeads.slice(0, 5);
 
   return (
-    <div className="rounded-xl bg-card p-6 shadow-sm border border-border">
+    <div className="rounded-sm bg-card p-6 shadow-sm border border-border">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-card-foreground">Conversiones Recientes</h3>
         <Button variant="ghost" size="sm" asChild>
