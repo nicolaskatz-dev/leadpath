@@ -8,11 +8,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { mockVisitors, visitorInsights, type Visitor } from '@/data/visitors';
 import { VisitorDetailDialog } from '@/components/VisitorDetailDialog';
-import { Users, TrendingUp, Target, Clock, Search, Filter, Eye, BarChart3 } from 'lucide-react';
+import { ExportCSVDialog } from '@/components/ExportCSVDialog';
+import { DeviceChart } from '@/components/dashboard/DeviceChart';
+import { CountryChart } from '@/components/dashboard/CountryChart';
+import { Users, TrendingUp, Target, Clock, Search, Filter, Eye, BarChart3, Download, Activity } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area, LineChart, Line } from 'recharts';
 
 const CHART_COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
 
@@ -53,6 +56,7 @@ export default function Visitors() {
   const [scoreFilter, setScoreFilter] = useState<string>('all');
   const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
   const filteredVisitors = useMemo(() => {
     return mockVisitors.filter((visitor) => {
@@ -79,12 +83,69 @@ export default function Visitors() {
   const convertedVisitors = mockVisitors.filter(v => v.status === 'converted').length;
   const avgScore = Math.round(mockVisitors.filter(v => v.status === 'active').reduce((sum, v) => sum + v.conversionScore, 0) / mockVisitors.filter(v => v.status === 'active').length);
 
+  // Device distribution
+  const deviceData = useMemo(() => {
+    const devices = mockVisitors.reduce((acc, v) => {
+      acc[v.device] = (acc[v.device] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const total = mockVisitors.length;
+    return Object.entries(devices).map(([device, count]) => ({
+      device,
+      count,
+      percentage: Math.round((count / total) * 100),
+    }));
+  }, []);
+
+  // Country distribution
+  const countryData = useMemo(() => {
+    const countries = mockVisitors.reduce((acc, v) => {
+      acc[v.country] = (acc[v.country] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    return Object.entries(countries)
+      .map(([country, count]) => ({ country, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+  }, []);
+
+  // Source distribution
+  const sourceData = useMemo(() => {
+    const sourceCounts = mockVisitors.reduce((acc, v) => {
+      acc[v.source] = (acc[v.source] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    return Object.entries(sourceCounts)
+      .map(([source, count]) => ({ source, count }))
+      .sort((a, b) => b.count - a.count);
+  }, []);
+
+  // Session trend data (mock)
+  const sessionTrendData = [
+    { day: 'Lun', sessions: 45 },
+    { day: 'Mar', sessions: 52 },
+    { day: 'Mié', sessions: 48 },
+    { day: 'Jue', sessions: 61 },
+    { day: 'Vie', sessions: 55 },
+    { day: 'Sáb', sessions: 32 },
+    { day: 'Dom', sessions: 28 },
+  ];
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Visitantes</h1>
-          <p className="text-muted-foreground">Todos los visitantes con scoring de probabilidad de conversión</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Visitantes</h1>
+            <p className="text-muted-foreground">Todos los visitantes con scoring de probabilidad de conversión</p>
+          </div>
+          <Button onClick={() => setExportDialogOpen(true)}>
+            <Download className="h-4 w-4 mr-2" />
+            Exportar CSV
+          </Button>
         </div>
 
         {/* Metrics */}
@@ -92,7 +153,7 @@ export default function Visitors() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-primary/10">
+                <div className="p-2 rounded-sm bg-primary/10">
                   <Users className="h-5 w-5 text-primary" />
                 </div>
                 <div>
@@ -105,7 +166,7 @@ export default function Visitors() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-green-500/10">
+                <div className="p-2 rounded-sm bg-green-500/10">
                   <TrendingUp className="h-5 w-5 text-green-500" />
                 </div>
                 <div>
@@ -118,7 +179,7 @@ export default function Visitors() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-yellow-500/10">
+                <div className="p-2 rounded-sm bg-yellow-500/10">
                   <Target className="h-5 w-5 text-yellow-500" />
                 </div>
                 <div>
@@ -131,7 +192,7 @@ export default function Visitors() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-blue-500/10">
+                <div className="p-2 rounded-sm bg-blue-500/10">
                   <Clock className="h-5 w-5 text-blue-500" />
                 </div>
                 <div>
@@ -143,7 +204,7 @@ export default function Visitors() {
           </Card>
         </div>
 
-        {/* Insights Charts */}
+        {/* Charts Row 1 */}
         <div className="grid gap-6 lg:grid-cols-2">
           <Card>
             <CardHeader>
@@ -159,7 +220,7 @@ export default function Visitors() {
                   <XAxis type="number" />
                   <YAxis dataKey="page" type="category" width={100} tick={{ fontSize: 12 }} />
                   <Tooltip />
-                  <Bar dataKey="visits" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="visits" fill="hsl(var(--primary))" radius={[0, 2, 2, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -182,9 +243,9 @@ export default function Visitors() {
                     cx="50%"
                     cy="50%"
                     outerRadius={80}
-                    label={({ range, percentage }) => `${percentage}%`}
+                    label={({ percentage }) => `${percentage}%`}
                   >
-                    {visitorInsights.scoreDistribution.map((entry, index) => (
+                    {visitorInsights.scoreDistribution.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                     ))}
                   </Pie>
@@ -196,6 +257,62 @@ export default function Visitors() {
                   <div key={item.range} className="flex items-center gap-2 text-sm">
                     <div className="h-3 w-3 rounded-full" style={{ backgroundColor: CHART_COLORS[index] }} />
                     <span className="text-muted-foreground">{item.range}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Charts Row 2 */}
+        <div className="grid gap-6 lg:grid-cols-4">
+          <DeviceChart data={deviceData} />
+          <CountryChart data={countryData} />
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Activity className="h-4 w-4" />
+                Sesiones por día
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={180}>
+                <AreaChart data={sessionTrendData}>
+                  <defs>
+                    <linearGradient id="colorSessions" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="day" tick={{ fontSize: 11 }} />
+                  <YAxis hide />
+                  <Tooltip />
+                  <Area 
+                    type="monotone" 
+                    dataKey="sessions" 
+                    stroke="hsl(var(--primary))" 
+                    fillOpacity={1} 
+                    fill="url(#colorSessions)" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">Por Fuente</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {sourceData.slice(0, 5).map((item) => (
+                  <div key={item.source} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className={cn('h-2 w-2 rounded-full', getSourceColor(item.source))} />
+                      <span className="text-sm">{item.source}</span>
+                    </div>
+                    <span className="text-sm font-medium">{item.count}</span>
                   </div>
                 ))}
               </div>
@@ -329,6 +446,12 @@ export default function Visitors() {
           visitor={selectedVisitor} 
           open={dialogOpen} 
           onOpenChange={setDialogOpen} 
+        />
+
+        <ExportCSVDialog
+          visitors={filteredVisitors}
+          open={exportDialogOpen}
+          onOpenChange={setExportDialogOpen}
         />
       </div>
     </DashboardLayout>
