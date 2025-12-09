@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { AttributionBreakdown, generateAttributions } from '@/components/dashboard/AttributionBreakdown';
 import { Search, Filter, Monitor, Smartphone, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -27,6 +28,22 @@ const sourceColors: Record<string, string> = {
 };
 
 const sources = ['Todas', 'TikTok', 'Google', 'Instagram', 'ChatGPT', 'LinkedIn', 'Direct'];
+
+// Mock function to get sources for a lead (simulating multi-touch)
+function getLeadSources(lead: Lead): string[] {
+  // For demo, some leads have multiple sources
+  const sourcesMap: Record<string, string[]> = {
+    '1': ['TikTok', 'Email', 'Direct'],
+    '2': ['Google'],
+    '3': ['ChatGPT', 'Google', 'Direct'],
+    '4': ['Instagram', 'Email'],
+    '5': ['LinkedIn', 'Google', 'Newsletter', 'Direct'],
+    '6': ['TikTok'],
+    '7': ['Google', 'Direct'],
+    '8': ['Direct'],
+  };
+  return sourcesMap[lead.id] || [lead.source];
+}
 
 const Conversions = () => {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
@@ -83,59 +100,71 @@ const Conversions = () => {
 
             {/* Lead cards */}
             <div className="space-y-2 max-h-[calc(100vh-280px)] overflow-y-auto">
-              {filteredLeads.map((lead) => (
-                <button
-                  key={lead.id}
-                  onClick={() => setSelectedLead(lead)}
-                  className={cn(
-                    'w-full text-left p-4 rounded-sm border transition-all',
-                    selectedLead?.id === lead.id
-                      ? 'bg-primary/10 border-primary'
-                      : 'bg-card border-border hover:border-primary/50'
-                  )}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium text-card-foreground truncate">
-                          {lead.name}
+              {filteredLeads.map((lead) => {
+                const leadSources = getLeadSources(lead);
+                const attributions = generateAttributions(leadSources);
+                
+                return (
+                  <button
+                    key={lead.id}
+                    onClick={() => setSelectedLead(lead)}
+                    className={cn(
+                      'w-full text-left p-4 rounded-sm border transition-all',
+                      selectedLead?.id === lead.id
+                        ? 'bg-primary/10 border-primary'
+                        : 'bg-card border-border hover:border-primary/50'
+                    )}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-card-foreground truncate">
+                            {lead.name}
+                          </p>
+                          {lead.device === 'Mobile' ? (
+                            <Smartphone className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                          ) : (
+                            <Monitor className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground truncate">
+                          {lead.email}
                         </p>
-                        {lead.device === 'Mobile' ? (
-                          <Smartphone className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                        ) : (
-                          <Monitor className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                        )}
                       </div>
-                      <p className="text-sm text-muted-foreground truncate">
-                        {lead.email}
-                      </p>
+                      <Badge
+                        className={cn(
+                          'shrink-0 text-xs',
+                          sourceColors[lead.source] || sourceColors.Direct
+                        )}
+                      >
+                        {lead.source}
+                      </Badge>
                     </div>
-                    <Badge
-                      className={cn(
-                        'shrink-0 text-xs',
-                        sourceColors[lead.source] || sourceColors.Direct
-                      )}
-                    >
-                      {lead.source}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between mt-3 text-sm">
-                    <span className="text-muted-foreground">
-                      {format(lead.conversionDate, "d MMM", { locale: es })}
-                    </span>
-                    <span className="font-semibold text-card-foreground">
-                      ${lead.conversionValue}
-                    </span>
-                  </div>
-                  <div className="flex gap-2 mt-2 text-xs text-muted-foreground">
-                    <span>{lead.pagesVisited} páginas</span>
-                    <span>•</span>
-                    <span>{lead.totalSessions} sesiones</span>
-                    <span>•</span>
-                    <span>{lead.daysToConvert}d</span>
-                  </div>
-                </button>
-              ))}
+                    
+                    {/* Attribution breakdown */}
+                    <div className="mt-3">
+                      <p className="text-xs text-muted-foreground mb-1">Atribución</p>
+                      <AttributionBreakdown attributions={attributions} compact />
+                    </div>
+                    
+                    <div className="flex items-center justify-between mt-3 text-sm">
+                      <span className="text-muted-foreground">
+                        {format(lead.conversionDate, "d MMM", { locale: es })}
+                      </span>
+                      <span className="font-semibold text-card-foreground">
+                        ${lead.conversionValue}
+                      </span>
+                    </div>
+                    <div className="flex gap-2 mt-2 text-xs text-muted-foreground">
+                      <span>{lead.pagesVisited} páginas</span>
+                      <span>•</span>
+                      <span>{lead.totalSessions} sesiones</span>
+                      <span>•</span>
+                      <span>{lead.daysToConvert}d</span>
+                    </div>
+                  </button>
+                );
+              })}
 
               {filteredLeads.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground">
@@ -158,6 +187,17 @@ const Conversions = () => {
                   <X className="h-4 w-4" />
                 </Button>
                 <LeadJourney lead={selectedLead} />
+                
+                {/* Attribution detail */}
+                <div className="mt-4 p-4 rounded-sm bg-card border border-border">
+                  <h4 className="text-sm font-semibold mb-3">Atribución Multi-Touch</h4>
+                  <AttributionBreakdown 
+                    attributions={generateAttributions(getLeadSources(selectedLead))} 
+                  />
+                  <p className="text-xs text-muted-foreground mt-3">
+                    El porcentaje de atribución indica el grado de responsabilidad de cada fuente en esta conversión.
+                  </p>
+                </div>
               </div>
             ) : (
               <div className="rounded-sm bg-card p-12 text-center border border-border">

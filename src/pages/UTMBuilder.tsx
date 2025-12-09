@@ -11,8 +11,16 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Copy, Check, Link2, Sparkles } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Copy, Check, Link2, Sparkles, Trash2, Save } from 'lucide-react';
 import { toast } from 'sonner';
+
+interface SavedUrl {
+  id: string;
+  name: string;
+  url: string;
+  createdAt: Date;
+}
 
 const sources = [
   { value: 'google', label: 'Google' },
@@ -45,6 +53,11 @@ const UTMBuilder = () => {
   const [utmContent, setUtmContent] = useState('');
   const [utmTerm, setUtmTerm] = useState('');
   const [copied, setCopied] = useState(false);
+  const [urlName, setUrlName] = useState('');
+  const [savedUrls, setSavedUrls] = useState<SavedUrl[]>(() => {
+    const saved = localStorage.getItem('leadpath_saved_urls');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   const generatedUrl = useMemo(() => {
     const params = new URLSearchParams();
@@ -58,8 +71,8 @@ const UTMBuilder = () => {
     return queryString ? `${baseUrl}?${queryString}` : baseUrl;
   }, [baseUrl, utmSource, utmMedium, utmCampaign, utmContent, utmTerm]);
 
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(generatedUrl);
+  const handleCopy = async (url?: string) => {
+    await navigator.clipboard.writeText(url || generatedUrl);
     setCopied(true);
     toast.success('URL copiada al portapapeles');
     setTimeout(() => setCopied(false), 2000);
@@ -72,11 +85,40 @@ const UTMBuilder = () => {
     setUtmCampaign('');
     setUtmContent('');
     setUtmTerm('');
+    setUrlName('');
+  };
+
+  const handleSaveUrl = () => {
+    if (!utmSource) {
+      toast.error('Debes completar al menos la fuente');
+      return;
+    }
+    
+    const name = urlName || `${utmSource}_${utmCampaign || 'campaign'}`;
+    const newUrl: SavedUrl = {
+      id: Date.now().toString(),
+      name,
+      url: generatedUrl,
+      createdAt: new Date(),
+    };
+    
+    const updated = [newUrl, ...savedUrls];
+    setSavedUrls(updated);
+    localStorage.setItem('leadpath_saved_urls', JSON.stringify(updated));
+    toast.success('URL guardada correctamente');
+    setUrlName('');
+  };
+
+  const handleDeleteUrl = (id: string) => {
+    const updated = savedUrls.filter(u => u.id !== id);
+    setSavedUrls(updated);
+    localStorage.setItem('leadpath_saved_urls', JSON.stringify(updated));
+    toast.success('URL eliminada');
   };
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 max-w-4xl">
+      <div className="space-y-6 max-w-5xl">
         {/* Page header */}
         <div>
           <h1 className="text-2xl font-bold text-foreground">Generador de UTMs</h1>
@@ -204,22 +246,36 @@ const UTMBuilder = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="p-4 bg-accent/50 rounded-lg break-all">
+                <div className="p-4 bg-accent/50 rounded-sm break-all">
                   <code className="text-sm text-accent-foreground">{generatedUrl}</code>
                 </div>
-                <Button onClick={handleCopy} className="w-full" disabled={!utmSource}>
-                  {copied ? (
-                    <>
-                      <Check className="mr-2 h-4 w-4" />
-                      Copiado!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="mr-2 h-4 w-4" />
-                      Copiar URL
-                    </>
-                  )}
-                </Button>
+                
+                <div className="flex gap-2">
+                  <Button onClick={() => handleCopy()} className="flex-1" disabled={!utmSource}>
+                    {copied ? (
+                      <>
+                        <Check className="mr-2 h-4 w-4" />
+                        Copiado!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="mr-2 h-4 w-4" />
+                        Copiar URL
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Nombre para guardar (ej: TikTok Black Friday)"
+                    value={urlName}
+                    onChange={(e) => setUrlName(e.target.value)}
+                  />
+                  <Button variant="outline" onClick={handleSaveUrl} disabled={!utmSource}>
+                    <Save className="h-4 w-4" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
@@ -247,6 +303,59 @@ const UTMBuilder = () => {
             </Card>
           </div>
         </div>
+
+        {/* Saved URLs */}
+        {savedUrls.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>URLs Guardadas</CardTitle>
+              <CardDescription>
+                Haz click en copiar para usar tus URLs guardadas
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nombre</TableHead>
+                    <TableHead>URL</TableHead>
+                    <TableHead className="w-[100px]">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {savedUrls.map((savedUrl) => (
+                    <TableRow key={savedUrl.id}>
+                      <TableCell className="font-medium">{savedUrl.name}</TableCell>
+                      <TableCell>
+                        <code className="text-xs text-muted-foreground truncate block max-w-md">
+                          {savedUrl.url}
+                        </code>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-1">
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => handleCopy(savedUrl.url)}
+                          >
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => handleDeleteUrl(savedUrl.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </DashboardLayout>
   );
